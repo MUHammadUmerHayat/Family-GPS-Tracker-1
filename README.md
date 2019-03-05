@@ -1,6 +1,6 @@
 # Family-GPS-Tracker
 
-1) type npm install command in cmd
+1) Type npm install or yarn install command in cmd
 
 2) Setup your firebase API key in config folder
 
