@@ -23,7 +23,7 @@ class SignInScreen extends Component {
                 expires,
                 permissions,
                 declinedPermissions,
-            } = await Expo.Facebook.logInWithReadPermissionsAsync('xxxxxxxxxxxxx', {
+            } = await Expo.Facebook.logInWithReadPermissionsAsync('', {
                 permissions: ['public_profile'],
             });
             if (type === 'success') {
