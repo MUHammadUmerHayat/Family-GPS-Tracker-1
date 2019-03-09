@@ -26,12 +26,12 @@ class myCircle extends Component {
         const db = firebase.firestore();
         const id = await AsyncStorage.getItem("userToken");
 
-        db.collection("circle").where("uid", "==", id).get().then(res => {
+        db.collection("circle").where("uid", "==", id).onSnapshot(res => {
             this.setState({ admin: [] })
-            debugger
+            
             if (res.docs.length) {
                 res.docs.forEach(d => {
-                    var e = { name: d.data().circle }
+                    var e = { id: d.id, name: d.data().circle }
                     this.setState({ admin: [...this.state.admin, e], adm: '', ad: true })
                 })
             } else {
@@ -40,15 +40,14 @@ class myCircle extends Component {
             }
         })
 
-        db.collection("circle").get().then(res => {
+        db.collection("circle").onSnapshot(res => {
             res.docs.forEach(a => {
 
-                debugger
-                this.setState({ user: [] })
-                db.collection("circle").doc(a.id).collection("members").where("uid", "==", id).get().then(b => {
+                db.collection("circle").doc(a.id).collection("members").where("uid", "==", id).onSnapshot(b => {
+                    this.setState({ user: [] })
                     if (b.docs.length) {
                         b.docs.forEach(c => {
-                            var b = { name: a.data().circle }
+                            var b = { id: a.id, name: a.data().circle }
                             this.setState({ user: [...this.state.user, b], usr: '', us: true })
                         })
                     } else {
@@ -66,6 +65,15 @@ class myCircle extends Component {
     }
 
 
+    async a(id){
+
+
+        await AsyncStorage.setItem("roomid",id).then(() =>{
+            this.props.navigation.navigate("Map",{room:id})
+        })
+
+    }
+
     render() {
         const { adm, admin, ad, usr, user, us } = this.state;
         return (
@@ -80,6 +88,12 @@ class myCircle extends Component {
                                     leftAvatar={{ source: { uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzNYd1Tiv0zjbY9Ggn8Mz_wruAjyoueuvX257D_NE4LXnG9SqY' } }}
                                     title={l.name}
                                     subtitle="Admin"
+                                    rightTitle={
+                                        <View>
+                                            <MaterialCommunityIcons name="chevron-right" size={32} color="#2b9077" />
+                                        </View>
+                                    }
+                                    onPress={() => this.a(l.id)}
                                 />
                             ))
                             :
@@ -104,6 +118,7 @@ class myCircle extends Component {
                                             <MaterialCommunityIcons name="chevron-right" size={32} color="#2b9077" />
                                         </View>
                                     }
+                                    onPress={() => this.a(l.id)}
                                     // badge={{ value: '>', textStyle: { color: 'orange' }, containerStyle: { marginTop: 0,backgroundColor: "#fff" } }}
                                 />
                             ))

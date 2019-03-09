@@ -28,7 +28,7 @@ class joinCircle extends Component {
                 
                 res.docs.forEach(data =>{
                     
-                    this.setState({uid: data.data().uid, name: data.data().name, img: data.data().url});
+                    this.setState({uid: data.data().uid, name: data.data().name, img: data.data().url, lat: data.data().latitude, lon: data.data().longitude});
 
                 })
             }
@@ -38,7 +38,7 @@ class joinCircle extends Component {
 
     _onFulfill(code){
         
-        const {uid, name, img} = this.state;
+        const {uid, name, img, lat, lon} = this.state;
         const db = firebase.firestore();
 
         // To check given key exists
@@ -68,7 +68,9 @@ class joinCircle extends Component {
                                     db.collection("circle").doc(data.id).collection("members").add({
                                         uid,
                                         name,
-                                        img
+                                        img,
+                                        lat,
+                                        lon
                                     }).then(() =>{
                                         this.props.navigation.navigate("Dashboard");
                                         alert("Joined Successfully");

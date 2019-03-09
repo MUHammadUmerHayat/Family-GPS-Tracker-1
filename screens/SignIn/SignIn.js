@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, AsyncStorage, Alert } from "react-native";
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+import {Location} from 'expo';
 
 class SignInScreen extends Component {
 
@@ -14,7 +15,31 @@ class SignInScreen extends Component {
         });
     }
 
+    componentDidMount(){
+        this._getLocationAsync()
+    }
+
+    _getLocationAsync = async () => {
+
+        let { status } = await Expo.Permissions.askAsync(Expo.Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.setState({
+                errorMessage: 'Permission to access location was denied',
+            });
+        }
+
+        let location = await Expo.Location.getCurrentPositionAsync({});
+        this.setState({ location, condition: true });
+
+        Location.watchPositionAsync({ distanceInterval: 1 }, (coords) => {
+            this.setState({ location: coords, latitude: coords.coords.latitude, longitude: coords.coords.longitude })
+        });
+
+
+    }; 
+
     logIn = async () => {
+        const {location, latitude, longitude} = this.state;
         try {
             const db = firebase.firestore();
             const {
@@ -23,7 +48,7 @@ class SignInScreen extends Component {
                 expires,
                 permissions,
                 declinedPermissions,
-            } = await Expo.Facebook.logInWithReadPermissionsAsync('', {
+            } = await Expo.Facebook.logInWithReadPermissionsAsync('2201221376567365', {
                 permissions: ['public_profile'],
             });
             if (type === 'success') {
@@ -36,7 +61,7 @@ class SignInScreen extends Component {
                         if (res.docs.length) {
                             this.token();
                         } else {
-                            db.collection("users").add({ uid: uid.id, url: uid.picture.data.url, name: uid.name }).then(() => {
+                            db.collection("users").add({ uid: uid.id, url: uid.picture.data.url, name: uid.name, location, latitude, longitude }).then(() => {
                                 this.token();
                             })
                         }
@@ -63,9 +88,8 @@ class SignInScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {/* <Button title='Continue' onPress={this.signIn}/>         */}
-                <TouchableOpacity style={styles.btn}>
-                    <Text style={styles.btn_text} onPress={this.logIn.bind(this)}>Log In with Facebook</Text>
+                <TouchableOpacity style={styles.btn} onPress={this.logIn.bind(this)}>
+                    <Text style={styles.btn_text}>Log In with Facebook</Text>
                 </TouchableOpacity>
             </View>
         );
