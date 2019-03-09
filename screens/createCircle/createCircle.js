@@ -28,7 +28,7 @@ class createCircle extends Component {
                 
                 res.docs.forEach(data =>{
                     
-                    this.setState({uid: data.data().uid, name: data.data().name})
+                    this.setState({uid: data.data().uid, name: data.data().name,img: data.data().url, latitude: data.data().latitude, longitude: data.data().longitude})
 
                 })
             }
@@ -38,7 +38,7 @@ class createCircle extends Component {
     }
 
     submit(){
-        const {name, uid, circle} = this.state;
+        const {name, uid, circle, latitude, longitude, img} = this.state;
         const db = firebase.firestore();
         let key = Math.random().toString().substring(2,7);
         
@@ -49,7 +49,10 @@ class createCircle extends Component {
                 uid,
                 name,
                 key,
-                circle
+                circle,
+                latitude,
+                longitude,
+                img
 
             }).then(() =>{
                 this.setState({circle: ''})
